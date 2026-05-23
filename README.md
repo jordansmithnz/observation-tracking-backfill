@@ -78,18 +78,3 @@ ObservationTrackingBackfill follows the automatic observation tracking behavior 
 ## Demo
 
 Open `ObservationTrackingBackfill.xcworkspace` and run the `ObservationTrackingBackfillDemo` scheme. The demo is a UIKit grocery list app using a collection view, observable model state, and a local Swift package reference to this framework.
-
-## Repository Layout
-
-```text
-Sources/
-  ObservationTrackingBackfill/
-Examples/
-  ObservationTrackingBackfillDemo/
-    ObservationTrackingBackfillDemo.xcodeproj
-ObservationTrackingBackfill.xcworkspace
-Package.swift
-README.md
-```
-
-Swift Package Manager only builds the library target at `Sources/ObservationTrackingBackfill`; the demo project is not part of the package.
