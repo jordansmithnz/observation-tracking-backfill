@@ -43,36 +43,6 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 ```
 
-Read observable model state from a supported UIKit callback:
-
-```swift
-import Observation
-import UIKit
-
-@Observable
-final class Counter {
-  var value = 0
-}
-
-final class CounterView: UIView {
-  let counter: Counter
-
-  init(counter: Counter) {
-    self.counter = counter
-    super.init(frame: .zero)
-  }
-
-  required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-
-  override func layoutSubviews() {
-    super.layoutSubviews()
-    backgroundColor = counter.value.isMultiple(of: 2) ? .systemBlue : .systemGreen
-  }
-}
-```
-
 ObservationTrackingBackfill follows the automatic observation tracking behavior from iOS 26 and macOS 26, backfilling the same method-based update points where possible on older systems.
 
 ## Demo
