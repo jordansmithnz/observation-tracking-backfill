@@ -1,10 +1,8 @@
 # ObservationTrackingBackfill
 
-ObservationTrackingBackfill brings UIKit and AppKit automatic observation tracking back to systems where Swift Observation exists but native view tracking is missing.
+iOS 17 and macOS 14 include Swift Observation, but not the automatic observation tracking that later OS versions support. Automatic tracking was introduced in iOS 26 and macOS 26, with backfill only supported to the prior app version. 
 
-iOS 17 and macOS 14 include Swift Observation, but UIKit and AppKit do not automatically track observable model reads in view, view controller, and configuration update methods. ObservationTrackingBackfill fills that gap by tracking observable values read inside supported callbacks and invalidating the right update pass when those values change.
-
-This is intended for apps that support iOS 17 or macOS 14 and want to use `@Observable` models from UIKit or AppKit without manually calling `setNeedsLayout()`, `setNeedsUpdateConfiguration()`, or similar invalidation methods after every model mutation.
+Apps that support iOS 17 or macOS 14 and want to use `@Observable` models from UIKit or AppKit without manually invalidating primitives may now do so.
 
 ## Requirements
 
@@ -39,7 +37,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-    ObservationTrackingBackfill.setup(with: .legacyOnly)
+    ObservationTrackingBackfill.setup(with: .full) // Use .legacyOnly if using native backfill
     return true
   }
 }
