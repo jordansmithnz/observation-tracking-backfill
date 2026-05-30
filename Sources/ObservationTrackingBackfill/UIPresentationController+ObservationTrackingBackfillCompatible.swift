@@ -1,53 +1,34 @@
 // Created by Jordan Smith
 
 #if canImport(UIKit)
-import UIKit
+  import UIKit
 
-extension UIPresentationController: ObservationTrackingBackfillCompatible {
-  @objc func __backfill_init(
-    presentedViewController: UIViewController,
-    presenting presentingViewController: UIViewController?
-  ) -> Self {
-    Self.backfillObservationTracking()
-    return self.__backfill_init(
-      presentedViewController: presentedViewController,
-      presenting: presentingViewController
-    )
-  }
-
-  // MARK: - ObservationTrackingBackfillCompatible
-
-  static var exchangedObservationSelectors: [(original: Selector, updated: Selector)] {
-    [
-      (
-        #selector(containerViewWillLayoutSubviews),
-        #selector(__backfill_containerViewWillLayoutSubviews)
-      ),
-      (
-        #selector(containerViewDidLayoutSubviews),
-        #selector(__backfill_containerViewDidLayoutSubviews)
+  extension UIPresentationController: ObservationTrackingBackfillCompatible {
+    // swift-format-ignore: AlwaysUseLowerCamelCase
+    @objc func __backfill_init(
+      presentedViewController: UIViewController,
+      presenting presentingViewController: UIViewController?
+    ) -> Self {
+      Self.backfillObservationTracking()
+      return self.__backfill_init(
+        presentedViewController: presentedViewController,
+        presenting: presentingViewController
       )
-    ]
-  }
+    }
 
-  @objc func __backfill_containerViewWillLayoutSubviews() {
-    withObservationTracking {
-      __backfill_containerViewWillLayoutSubviews()
-    } onChange: { [weak self] in
-      onMainIfNeeded { [weak self] in
-        self?.containerView?.setNeedsLayout()
-      }
+    // MARK: - ObservationTrackingBackfillCompatible
+
+    static var exchangedObservationMethods: [ObservationTrackingBackfillMethod] {
+      [
+        .void(#selector(containerViewWillLayoutSubviews)) {
+          (presentationController: UIPresentationController) in
+          presentationController.containerView?.setNeedsLayout()
+        },
+        .void(#selector(containerViewDidLayoutSubviews)) {
+          (presentationController: UIPresentationController) in
+          presentationController.containerView?.setNeedsLayout()
+        },
+      ]
     }
   }
-
-  @objc func __backfill_containerViewDidLayoutSubviews() {
-    withObservationTracking {
-      __backfill_containerViewDidLayoutSubviews()
-    } onChange: { [weak self] in
-      onMainIfNeeded { [weak self] in
-        self?.containerView?.setNeedsLayout()
-      }
-    }
-  }
-}
 #endif

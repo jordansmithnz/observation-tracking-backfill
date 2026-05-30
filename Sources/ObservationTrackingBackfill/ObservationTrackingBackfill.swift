@@ -1,12 +1,13 @@
 // Created by Jordan Smith
 
+import ObjectiveC
+
 #if canImport(UIKit)
-import UIKit
+  import UIKit
 #endif
 #if canImport(AppKit)
-import AppKit
+  import AppKit
 #endif
-import ObjectiveC
 
 @MainActor
 private var isSetup = false
@@ -29,45 +30,45 @@ public enum ObservationTrackingBackfill {
     guard !isSetup else { return }
     guard strategy.isEnabled else { return }
 
-#if canImport(UIKit)
-    if strategy.shouldBackfillUIKit {
-      performMethodExchange(
-        UIView.self,
-        #selector(UIView.init(frame:)),
-        #selector(UIView.__backfill_init(frame:))
-      )
-      performMethodExchange(
-        UIViewController.self,
-        #selector(UIViewController.init(nibName:bundle:)),
-        #selector(UIViewController.__backfill_init(nibName:bundle:))
-      )
-      performMethodExchange(
-        UIPresentationController.self,
-        #selector(UIPresentationController.init(presentedViewController:presenting:)),
-        #selector(UIPresentationController.__backfill_init(presentedViewController:presenting:))
-      )
-    }
-#endif
-#if canImport(AppKit) && !targetEnvironment(macCatalyst)
-    if strategy.shouldBackfillAppKit {
-      performMethodExchange(
-        NSView.self,
-        #selector(NSView.init(frame:)),
-        #selector(NSView.__backfill_init(frame:))
-      )
-      performMethodExchange(
-        NSViewController.self,
-        #selector(NSViewController.init(nibName:bundle:)),
-        #selector(NSViewController.__backfill_init(nibName:bundle:))
-      )
-    }
-#endif
+    #if canImport(UIKit)
+      if strategy.shouldBackfillUIKit {
+        performMethodExchange(
+          UIView.self,
+          #selector(UIView.init(frame:)),
+          #selector(UIView.__backfill_init(frame:))
+        )
+        performMethodExchange(
+          UIViewController.self,
+          #selector(UIViewController.init(nibName:bundle:)),
+          #selector(UIViewController.__backfill_init(nibName:bundle:))
+        )
+        performMethodExchange(
+          UIPresentationController.self,
+          #selector(UIPresentationController.init(presentedViewController:presenting:)),
+          #selector(UIPresentationController.__backfill_init(presentedViewController:presenting:))
+        )
+      }
+    #endif
+    #if canImport(AppKit) && !targetEnvironment(macCatalyst)
+      if strategy.shouldBackfillAppKit {
+        performMethodExchange(
+          NSView.self,
+          #selector(NSView.init(frame:)),
+          #selector(NSView.__backfill_init(frame:))
+        )
+        performMethodExchange(
+          NSViewController.self,
+          #selector(NSViewController.init(nibName:bundle:)),
+          #selector(NSViewController.__backfill_init(nibName:bundle:))
+        )
+      }
+    #endif
     isSetup = true
   }
 }
 
-private extension ObservationTrackingBackfill.Strategy {
-  var isEnabled: Bool {
+extension ObservationTrackingBackfill.Strategy {
+  fileprivate var isEnabled: Bool {
     switch self {
     case .legacyOnly, .full:
       true
@@ -76,41 +77,41 @@ private extension ObservationTrackingBackfill.Strategy {
     }
   }
 
-#if canImport(UIKit)
-  var shouldBackfillUIKit: Bool {
-    switch self {
-    case .legacyOnly:
-      if #available(iOS 18.0, tvOS 18.0, macCatalyst 18.0, *) {
+  #if canImport(UIKit)
+    fileprivate var shouldBackfillUIKit: Bool {
+      switch self {
+      case .legacyOnly:
+        if #available(iOS 18.0, tvOS 18.0, macCatalyst 18.0, *) {
+          return false
+        }
+        return true
+      case .full:
+        if #available(iOS 26.0, tvOS 26.0, macCatalyst 26.0, *) {
+          return false
+        }
+        return true
+      case .disabled:
         return false
       }
-      return true
-    case .full:
-      if #available(iOS 26.0, tvOS 26.0, macCatalyst 26.0, *) {
-        return false
-      }
-      return true
-    case .disabled:
-      return false
     }
-  }
-#endif
+  #endif
 
-#if canImport(AppKit) && !targetEnvironment(macCatalyst)
-  var shouldBackfillAppKit: Bool {
-    switch self {
-    case .legacyOnly:
-      if #available(macOS 15.0, *) {
+  #if canImport(AppKit) && !targetEnvironment(macCatalyst)
+    fileprivate var shouldBackfillAppKit: Bool {
+      switch self {
+      case .legacyOnly:
+        if #available(macOS 15.0, *) {
+          return false
+        }
+        return true
+      case .full:
+        if #available(macOS 26.0, *) {
+          return false
+        }
+        return true
+      case .disabled:
         return false
       }
-      return true
-    case .full:
-      if #available(macOS 26.0, *) {
-        return false
-      }
-      return true
-    case .disabled:
-      return false
     }
-  }
-#endif
+  #endif
 }

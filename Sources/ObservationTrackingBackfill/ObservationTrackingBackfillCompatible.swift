@@ -4,7 +4,7 @@ import Foundation
 
 @MainActor
 protocol ObservationTrackingBackfillCompatible: AnyObject {
-  static var exchangedObservationSelectors: [(original: Selector, updated: Selector)] { get }
+  static var exchangedObservationMethods: [ObservationTrackingBackfillMethod] { get }
 }
 
 extension NSObject {
@@ -13,14 +13,10 @@ extension NSObject {
       guard !ObservationTrackingBackfillRegistry.shared.includes(self) else { return }
       ObservationTrackingBackfillRegistry.shared.insert(self)
       guard let compatibleType = self as? ObservationTrackingBackfillCompatible.Type else { return }
-      let selectors = compatibleType.exchangedObservationSelectors
-      for (original, updated) in selectors {
-        guard implementsSelector(self, original) else { continue }
-        performLocalizedMethodExchange(
-          self,
-          original,
-          updated
-        )
+      let methods = compatibleType.exchangedObservationMethods
+      for method in methods {
+        guard implementsSelector(self, method.selector) else { continue }
+        method.install(self)
       }
     }
   }

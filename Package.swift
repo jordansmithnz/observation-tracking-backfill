@@ -6,7 +6,7 @@ let package = Package(
   name: "ObservationTrackingBackfill",
   platforms: [
     .iOS(.v17),
-    .macOS(.v14)
+    .macOS(.v14),
   ],
   products: [
     .library(
@@ -19,7 +19,7 @@ let package = Package(
     .testTarget(
       name: "ObservationTrackingBackfillTests",
       dependencies: ["ObservationTrackingBackfill"]
-    )
+    ),
   ],
   swiftLanguageModes: [.v6]
 )
